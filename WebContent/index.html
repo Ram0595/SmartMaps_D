@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<meta name="keywords" content="html5, css3, form, switch, animation, :target, pseudo-class" />
+<meta name="author" content="Codrops" />
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="http://lipis.github.io/bootstrap-social/bootstrap-social.css">
+<link rel="stylesheet" href="http://lipis.github.io/bootstrap-social/assets/css/font-awesome.css">
+<style>
+</style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar  navbar-top" id="my-navbar">
+<div class="container">
+<div class="navbar-header">
+	<p class="navbar-brand">Login</p>
+</div>
+</div>
+
+</nav>
+
+<div class="jumbotron">
+<div class="container text-center">
+<form id="my-form">
+<input type="text" class="form-control" id="uname" name="username" placeholder="Username" required="required" /><p></p>
+<input type="password" class="form-control" id="pwd" name="password" placeholder="Password" required="required" /><p></p>
+<button type="submit" class="btn btn-info btn-lg btn-block">SIGN IN</button>
+</form>
+<div style="text-align:right;"><a href="#">Forgot Password?</a></div> 
+<p>Don't have an account? <a href="signup.html">Sign up</a></p>
+</div>
+</div>
+<div class="navbar navbar-bottom">
+<div class="container text-center">
+
+
+<p>OR</p>
+
+<a href="#" class="btn btn-block btn-social btn-facebook">
+    <i class="fa fa-facebook"></i> Sign in with Facebook
+  </a><p></p>
+   <a href="googlesignin.html" class="btn btn-block btn-social btn-google">
+    <i class="fa fa-google"></i> Sign in with Google
+  </a><p />
+ <div><p>I accept to the <a href="#">Terms &amp; Conditions</a> &amp; <a href="#">Privacy Ploicy</a></div>
+  </div>
+  </div>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+    (function($){
+        function processForm( e ){
+            $.ajax({
+                url: 'http://localhost:8080/AjaxSamplee/login/loginclass/example/ajax',
+                dataType: 'application/x-www-form-urlencoded',
+                dataType: 'text',
+                type: 'post',
+                contentType: 'application/x-www-form-urlencoded',
+              data: $(this).serialize(),
+                success: function( data, textStatus, jQxhr ){
+                    $('#response pre').html( data );
+                },
+                error: function( jqXhr, textStatus, errorThrown ){
+                    console.log( errorThrown );
+                }
+            });
+
+            e.preventDefault();
+        }
+
+        $('#my-form').submit( processForm );
+    })(jQuery);
+</script>
+
+
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+</html>
