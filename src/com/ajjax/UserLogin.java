@@ -5,21 +5,28 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import javax.ws.rs.Produces;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+//import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 @Path("loginclass/example")
 public class UserLogin {
@@ -32,123 +39,58 @@ public class UserLogin {
 	@Consumes("application/x-www-form-urlencoded")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response userService(
-			@Context UriInfo uriInfo,
+			@Context HttpHeaders hh,  //HttpHeader For Reading Cookies From Request
+			//@Context UriInfo uriInfo,    
 			@FormParam("username") String username,
 			@FormParam("password") String password
-			) throws SQLException {
+			) {
 
-
-		
-		Connection con=null;
-		PreparedStatement ps=null;
-		String statement="";
 		//String retString="";
 		
 		
-		
-		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Map<String, Cookie> cookieMap = hh.getCookies();
+			Set<String> keys=cookieMap.keySet();
+			//String st;
+			//if(!keys.isEmpty())
+			//{
+				if(keys.contains("status")) {
+					for(String st:keys) { 
+						if(cookieMap.get(st).getValue().equals("logged_in")&&!cookieMap.get("token").getValue().isEmpty())
+						{
+							// return already loggedin response
+							JSONArray x=new JSONArray();
+							JSONObject x2=new JSONObject();
+							x2.put("status", "logged_in");
+							resp=Response.ok(x).build();
+							 
+							 return resp;			
+						}
+					}
+				}
+				else { //if user not loggedin
+					Login_Validate loginValidate=new Login_Validate();
+					String x=loginValidate.loginUser(username,password);
+					 resp=Response.ok(x).build();
+					 
+					 return resp;
+					 
+				}
+			//}
 			
-			System.out.println("Driver Loaded");
-			
-			con=DriverManager.getConnection("jdbc:mysql://localhost/smart_maps","smartguy","smartguy");
-			
-			System.out.println("Connected To MySql");
+			/*for(String s:keys) {
+				System.out.println("Cooikie "+pathParams.get(s));
+				
+				System.out.println("Key "+s);
+			}*/ 
 			
 
-			
-			statement="SELECT user_name,password FROM users "
-					+ "WHERE user_name='"+username+"' AND password='"+password+"';";
-			
-			System.out.println("STATEMENT : "+statement);
-			ps=con.prepareStatement(statement);
-			
-			ResultSet rs=ps.executeQuery();
-			
-			JSONArray jsona=new JSONArray();
-			JSONObject json = new JSONObject();
-			
-			//ClientResponse response = resource.path("rest").path("vtn").path("addEmplyee")
-			 //       .type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, mapper.writeValueAsString(employee)); 
-			
-			int count=0;
-			while(rs.next())
-			{
-				count=count+1;
-			}
-			if(count==0)
-			{
-				
-				System.out.println("No User Found!! ");
-				
-				
-				json.append("status","nouser");
-				
-				ps.close();
-				con.close();
-				
-				
-				System.out.println(" Status  "+json.get("status"));
-				System.out.println(json);
-				jsona.put(json);
-				String x=jsona.toString();
-				
-		        resp=Response.ok(x).build();
-		        return resp;
-				
-		        
-			}
-			else
-			{	 
-				 String uuid = UUID.randomUUID().toString().substring(20);
-				 System.out.println("TOKEN :  uuid = " + uuid);
-			
-
-					json.append("status","logged_in");
-					json.append("token", uuid);
-				
-				System.out.println(" User Found!!");
-				
-				
-				ps.close();
-				con.close();
-				
-				System.out.println(json);
-				System.out.println(" Status  "+json.get("status"));
-				jsona.put(json);
-				
-				//ResponseBuilder responseBuilder = Response.created(uriInfo.getAbsolutePath().resolve("VAMSEEEE"));
-				  //return responseBuilder.entity(jsona).build();
-				
-				String x=jsona.toString();
-				
-				resp=Response.ok(x).build();
-				return resp; 
-			}
-			
-			
-			
-			
-			  
-			
-			
-			//ps.close();
-			//con.close();
-			//return retString;
-			
-		}catch(Exception e) {
-			e.printStackTrace();
-			
-		}
-		finally {
-			if(con!=null)
-				con.close();
+		} catch(NullPointerException | SQLException | JSONException n) {
+			n.printStackTrace();
 		}
 		
-		ps.close();
-		con.close();
-		return null;
+		
+				return null;
      
      
 	
